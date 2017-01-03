@@ -105,6 +105,19 @@ class IRCClient(object):
                 await self.send("PRIVMSG", dest, current)
 
 class IRCClientConfig(object):
+    """
+    IRCClientConfig is a helper to execute coroutines on an IRCConnection
+    object. Its basic usage is something like:
+
+        conf = IRCClientConfig("chat.freenode.net", 6697)
+        conf.register("nick", "ident", "realname")
+        conf.join("#channel", "#otherchannel")
+        client = conf.configure()
+        ... some event handler setup ...
+        import asyncio
+        asyncio.get_event_loop().run_forever()
+    """
+
     def __init__(self, host, port, ssl=True):
         self.conn = connection.IRCConnection(host, port, ssl)
         self.client = IRCClient(self.conn)
