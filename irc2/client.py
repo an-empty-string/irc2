@@ -125,9 +125,9 @@ class IRCClientConfig(object):
 
     async def _run(self):
         await self.conn.connect()
+        asyncio.get_event_loop().create_task(self.client.handle())
         for coro in self.coros:
             await coro
-        await self.client.handle()
 
     def configure(self):
         asyncio.get_event_loop().create_task(self._run())

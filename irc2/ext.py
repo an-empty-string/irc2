@@ -1,6 +1,9 @@
 """irc2 extensions (cap, sasl, etc)"""
 
+from . import parser, utils
+import asyncio
 import base64
+import collections
 
 class IRCCaps(object):
     """
@@ -9,6 +12,20 @@ class IRCCaps(object):
     def __init__(self, client):
         self.client = client
         self.caps = set()
+        self.waiting_caps = utils.IDefaultDict(asyncio.Future)
+
+        client.subscribe(parser.Message(verb="CAP"), self._handle_cap)
+
+    async def _handle_cap(self, message):
+        _, sub = message.args[:2]
+        if sub == "ACK" or sub == "NAK":
+            caps = message.args[2]
+            for cap in caps.split():
+                if sub == "ACK":
+                    self.caps.add(cap)
+                    self.waiting_caps[cap].set_result(True)
+                elif sub == "NAK":
+                    self.waiting_caps[cap].set_result(False)
 
     async def req(self, cap):
         """
@@ -16,17 +33,11 @@ class IRCCaps(object):
         the capability, or if the server ACKed our request, or False if the
         server responded with NAK.
         """
-        if cap in self.caps:
-            return True
-        await self.client.send("CAP", "REQ", cap)
-        message = await self.client.irc.match(Message(verb="CAP", args=[None, ["ACK", "NAK"], cap]))
-        _, sub, current_cap = message.args
+        if not self.waiting_caps[cap].done():
+            await self.client.send("CAP", "REQ", cap)
+            await self.waiting_caps[cap]
 
-        if sub == "ACK":
-            self.caps.add(cap)
-            return True
-        elif sub == "NAK":
-            return False
+        return self.waiting_caps[cap].result()
 
     async def end(self):
         await self.client.send("CAP", "END")

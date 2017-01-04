@@ -2,6 +2,33 @@
 
 from .utils import IStr
 
+class Prefix(object):
+    """
+    Prefix represents a source of an IRC message, usually a hostmask.
+
+    Instance variables:
+        prefix      The complete prefix.
+        nick        A nickname, or None.
+        ident       An ident/username, or None.
+        host        A hostname, or None.
+    """
+    def __init__(self, prefix):
+        self.prefix = prefix
+        self._parse()
+
+    def _parse(self):
+        if "!" not in self.prefix or "@" not in self.prefix:
+            return
+        self.nick, rest = self.prefix.split("!", maxsplit=1)
+        self.user, self.host = rest.split("@", maxsplit=1)
+
+        self.nick = IStr(self.nick)
+        self.user = IStr(self.user)
+        self.host = IStr(self.host)
+
+    def __repr__(self):
+        return "Prefix({})".format(repr(self.prefix))
+
 class Message(object):
     """
     Message represents a complete or partial IRC message.
@@ -18,6 +45,9 @@ class Message(object):
         self.prefix = prefix
         self.verb = verb
         self.args = args
+
+        if self.prefix is not None and not isinstance(self.prefix, Prefix):
+            self.prefix = Prefix(self.prefix)
 
     def __repr__(self):
         return "Message(tags={}, prefix={}, verb={}, args={})".format(self.tags, self.prefix, self.verb, self.args)
@@ -123,7 +153,7 @@ def parse_line(line):
 
     if line.startswith(":"):
         prefix, line = line.split(" ", maxsplit=1)
-        prefix = IStr(prefix[1:])
+        prefix = Prefix(prefix[1:])
 
     verb, line = line.split(" ", maxsplit=1)
     verb = IStr(verb)

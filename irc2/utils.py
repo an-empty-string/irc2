@@ -73,6 +73,27 @@ class IDict(collections.MutableMapping):
     def __repr__(self):
         return "IDict({" + ", ".join(repr(key) + ": " + repr(value) for key, value in self._data.values()) + "})"
 
+class IDefaultDict(IDict):
+    """
+    IDefaultDict is IDict but with collections.defaultdict functionality:
+
+    >>> d = IDefaultDict(int)
+    >>> d["A"] += 1
+    >>> d["A"]
+    1
+    >>> d["a"]
+    1
+    """
+
+    def __init__(self, default, data={}, **more_data):
+        self.default = default
+        super().__init__(data, **more_data)
+
+    def __getitem__(self, key):
+        if IStr(key).lower() not in self._data:
+            self._data[IStr(key).lower()] = key, self.default()
+        return super().__getitem__(key)
+
 def join_max_length(l, sep, maxlen=400):
     """
     Join the items in l with sep such that the result is not longer than
