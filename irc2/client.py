@@ -4,6 +4,44 @@ from . import connection, event, ext, handler, utils
 import asyncio
 import logging
 
+class IRCClientConfig(object):
+    """
+    IRCClientConfig is a helper to execute coroutines on an IRCConnection
+    object. Its basic usage is something like:
+
+        conf = IRCClientConfig("chat.freenode.net", 6697)
+        conf.register("nick", "ident", "realname")
+        conf.join("#channel", "#otherchannel")
+        client = conf.configure()
+        ... some event handler setup ...
+        import asyncio
+        asyncio.get_event_loop().run_forever()
+    """
+
+    def __init__(self, host, port, ssl=True):
+        self.conn = connection.IRCConnection(host, port, ssl)
+        self.client = IRCClient(self.conn)
+        self.coros = []
+
+    async def _run(self):
+        await self.conn.connect()
+        for coro in self.coros:
+            await coro
+        await self.client.handle()
+
+    def configure(self):
+        asyncio.get_event_loop().create_task(self._run())
+        return self.client
+
+    def _add_coro(self, path, *args, **kwargs):
+        item = self.client
+        for point in path:
+            item = getattr(item, point)
+        self.coros.append(item(*args, **kwargs))
+
+    def __getattr__(self, attr):
+        return utils.AttrGetFollower([attr], self._add_coro)
+
 class IRCClient(object):
     """
     IRCClient wraps an IRCConnection to provide helpers, manages extensions
@@ -103,44 +141,6 @@ class IRCClient(object):
             while left:
                 current, left = utils.join_max_length(left, "", 350)
                 await self.send("PRIVMSG", dest, current)
-
-class IRCClientConfig(object):
-    """
-    IRCClientConfig is a helper to execute coroutines on an IRCConnection
-    object. Its basic usage is something like:
-
-        conf = IRCClientConfig("chat.freenode.net", 6697)
-        conf.register("nick", "ident", "realname")
-        conf.join("#channel", "#otherchannel")
-        client = conf.configure()
-        ... some event handler setup ...
-        import asyncio
-        asyncio.get_event_loop().run_forever()
-    """
-
-    def __init__(self, host, port, ssl=True):
-        self.conn = connection.IRCConnection(host, port, ssl)
-        self.client = IRCClient(self.conn)
-        self.coros = []
-
-    async def _run(self):
-        await self.conn.connect()
-        asyncio.get_event_loop().create_task(self.client.handle())
-        for coro in self.coros:
-            await coro
-
-    def configure(self):
-        asyncio.get_event_loop().create_task(self._run())
-        return self.client
-
-    def _add_coro(self, path, *args, **kwargs):
-        item = self.client
-        for point in path:
-            item = getattr(item, point)
-        self.coros.append(item(*args, **kwargs))
-
-    def __getattr__(self, attr):
-        return utils.AttrGetFollower([attr], self._add_coro)
 
 if __name__ == '__main__':
     import doctest

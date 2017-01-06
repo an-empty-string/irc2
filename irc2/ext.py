@@ -33,9 +33,9 @@ class IRCCaps(object):
         the capability, or if the server ACKed our request, or False if the
         server responded with NAK.
         """
-        if not self.waiting_caps[cap].done():
-            await self.client.send("CAP", "REQ", cap)
-            await self.waiting_caps[cap]
+        await self.client.send("CAP", "REQ", cap)
+        while not self.waiting_caps[cap].done():
+            await self.client.irc.match(verb="CAP")
 
         return self.waiting_caps[cap].result()
 

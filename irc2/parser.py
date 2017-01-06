@@ -137,39 +137,48 @@ def parse_line(line):
     Parse an IRC message from a bytestring into a Message object.
 
     >>> parse_line(b":irc.fwilson.me NOTICE #hello :hello from the server")
-    Message(tags={}, prefix=irc.fwilson.me, verb=NOTICE, args=['#hello', 'hello from the server'])
+    Message(tags={}, prefix=Prefix('irc.fwilson.me'), verb=NOTICE, args=['#hello', 'hello from the server'])
+    >>> parse_line(b"HELP")
+    Message(tags={}, prefix=None, verb=HELP, args=[])
     """
 
-    if isinstance(line, bytes):
-        line = line.decode('utf-8')
-    line = line.strip()
+    try:
+        if isinstance(line, bytes):
+            line = line.decode('utf-8')
+        line = line.strip()
 
-    tags = {}
-    prefix = None
+        tags = {}
+        prefix = None
 
-    if line.startswith("@"):
-        tags, line = line.split(" ", maxsplit=1)
-        tags = parse_tags(tags)
+        if line.startswith("@"):
+            tags, line = line.split(" ", maxsplit=1)
+            tags = parse_tags(tags)
 
-    if line.startswith(":"):
-        prefix, line = line.split(" ", maxsplit=1)
-        prefix = Prefix(prefix[1:])
+        if line.startswith(":"):
+            prefix, line = line.split(" ", maxsplit=1)
+            prefix = Prefix(prefix[1:])
 
-    verb, line = line.split(" ", maxsplit=1)
-    verb = IStr(verb)
+        verb_and_rest = line.split(" ", maxsplit=1)
+        verb, line = verb_and_rest[0], ""
+        if len(verb_and_rest) > 1:
+            verb, line = verb_and_rest
 
-    if line.startswith(":"):
-        args = [line[1:]]
-    elif " :" not in line:
-        args = line.split()
-    else:
-        args, lastarg = line.split(" :", maxsplit=1)
-        args = args.split(" ") if args else []
-        args.append(lastarg)
+        verb = IStr(verb)
 
-    args = [IStr(arg) for arg in args]
+        if line.startswith(":"):
+            args = [line[1:]]
+        elif " :" not in line:
+            args = line.split()
+        else:
+            args, lastarg = line.split(" :", maxsplit=1)
+            args = args.split(" ") if args else []
+            args.append(lastarg)
 
-    return Message(tags, prefix, verb, args)
+        args = [IStr(arg) for arg in args]
+
+        return Message(tags, prefix, verb, args)
+    except:
+        return None
 
 if __name__ == '__main__':
     import doctest

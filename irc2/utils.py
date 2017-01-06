@@ -1,5 +1,6 @@
 """irc2 general utilities"""
 
+import asyncio
 import collections
 import time
 
