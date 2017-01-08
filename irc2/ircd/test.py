@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 import asyncio
 from .client import clients
+
 
 async def handle_incoming(reader, writer):
     client = clients.new(reader, writer)
@@ -10,6 +12,7 @@ async def handle_incoming(reader, writer):
             return client.done()
         else:
             clients.write_all("{}: {}\n".format(client.id, line).encode())
+
 
 loop = asyncio.get_event_loop()
 coro = asyncio.start_server(handle_incoming, "127.0.0.1", 8888)

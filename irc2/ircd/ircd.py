@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 from .client import clients
 from .handler import handler
 import asyncio
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+
 
 async def handle_incoming(reader, writer):
     client = clients.new(reader, writer, handler)
@@ -15,6 +17,7 @@ async def handle_incoming(reader, writer):
 
         else:
             handler.handle(client, line)
+
 
 loop = asyncio.get_event_loop()
 clients.loop = loop

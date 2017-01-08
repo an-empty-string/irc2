@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 """irc2 parser"""
 
 from .utils import IStr
+
 
 class Prefix(object):
     """
@@ -12,6 +14,7 @@ class Prefix(object):
         ident       An ident/username, or None.
         host        A hostname, or None.
     """
+
     def __init__(self, prefix):
         self.prefix = prefix
         self._parse()
@@ -28,6 +31,7 @@ class Prefix(object):
 
     def __repr__(self):
         return "Prefix({})".format(repr(self.prefix))
+
 
 class Message(object):
     """
@@ -107,6 +111,7 @@ class Message(object):
 
         return self._matches(self.prefix, test.prefix) and self._matches(self.verb, test.verb)
 
+
 def parse_tags(tagstr):
     """
     Parse a series of IRCv3 tags in the format:
@@ -131,6 +136,7 @@ def parse_tags(tagstr):
             tags[IStr(tagstr)] = True
 
     return tags
+
 
 def parse_line(line):
     """
@@ -179,6 +185,7 @@ def parse_line(line):
         return Message(tags, prefix, verb, args)
     except:
         return None
+
 
 if __name__ == '__main__':
     import doctest

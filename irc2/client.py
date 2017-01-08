@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 """irc2 client core"""
 
 from . import connection, event, ext, handler, utils
 import asyncio
 import logging
+
 
 class IRCClientConfig(object):
     """
@@ -42,6 +44,7 @@ class IRCClientConfig(object):
     def __getattr__(self, attr):
         return utils.AttrGetFollower([attr], self._add_coro)
 
+
 class IRCClient(object):
     """
     IRCClient wraps an IRCConnection to provide helpers, manages extensions
@@ -53,6 +56,7 @@ class IRCClient(object):
     most applications. Use decorators like "client.event.message" to subscribe
     functions to Dispatcher events.
     """
+
     def __init__(self, irc):
         self.subscriptions = []
         self.bucket = utils.TokenBucket(4, 2)
@@ -106,7 +110,7 @@ class IRCClient(object):
         async for line in self.irc:
             await self._run_handlers(line)
 
-    ## Commands
+    # Commands
     async def join(self, *channels):
         """
         Join the specified channel or channels.
@@ -141,6 +145,7 @@ class IRCClient(object):
             while left:
                 current, left = utils.join_max_length(left, "", 350)
                 await self.send("PRIVMSG", dest, current)
+
 
 if __name__ == '__main__':
     import doctest
