@@ -95,7 +95,7 @@ class Message(object):
         for tag in self.tags:
             if tag not in test.tags:
                 return False
-            if not _matches(self.tags[tag], test.tags[tag]):
+            if not self._matches(self.tags[tag], test.tags[tag]):
                 return False
 
         if len(self.args) > len(test.args):
