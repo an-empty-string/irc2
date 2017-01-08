@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """irc2 low-level event handler"""
 
 from . import utils
@@ -9,6 +10,7 @@ class IRCHandler(object):
     IRCHandler handles incoming messages from an IRCClient. This is usually not
     something applications have to worry about.
     """
+
     def __init__(self, client):
         client.subscribe(Message(), self.handle_all)
         client.subscribe(Message(verb="PING"), self.handle_ping)

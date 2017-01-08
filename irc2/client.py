@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """irc2 client core"""
 
 from . import connection, event, ext, handler, utils
@@ -53,6 +54,7 @@ class IRCClient(object):
     most applications. Use decorators like "client.event.message" to subscribe
     functions to Dispatcher events.
     """
+
     def __init__(self, irc):
         self.subscriptions = []
         self.bucket = utils.TokenBucket(4, 2)
@@ -106,7 +108,7 @@ class IRCClient(object):
         async for line in self.irc:
             await self._run_handlers(line)
 
-    ## Commands
+    # Commands
     async def join(self, *channels):
         """
         Join the specified channel or channels.

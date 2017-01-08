@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """irc2 general utilities"""
 
 import asyncio
@@ -50,6 +51,7 @@ class IDict(collections.MutableMapping):
     >>> "a" in d and d["A"] == d["a"]
     True
     """
+
     def __init__(self, data={}, **more_data):
         self._data = dict()
         self.update(data)

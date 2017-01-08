@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """irc2 connection management"""
 
 from . import parser
@@ -86,4 +87,3 @@ class IRCConnection(object):
 
         logging.info("Send: {}".format(parser.parse_line(line)))
         self.writer.write(line)
-

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from .handler import handler
 from .numerics import RPL_WELCOME, RPL_YOURHOST, RPL_ISUPPORT, RPL_MOTDSTART, RPL_MOTD, RPL_ENDOFMOTD
 import re
@@ -38,17 +39,19 @@ def parse_mode(mode, kinds):
     args = args.split()
 
     cstr = "+"
-    result = ([], []) # adding, removing
+    result = ([], [])  # adding, removing
     for char in mode:
         if char == "+" or char == "-":
             cstr = char
         elif cstr == "+" and (char in at or char in bt or char in ct):
-            if not args: return False, ("Not enough arguments to add mode {}".format(char))
+            if not args:
+                return False, ("Not enough arguments to add mode {}".format(char))
             result[0].append((char, args.pop(0)))
         elif cstr == "+" and char in dt:
             result[0].append(char)
         elif cstr == "-" and (char in at or char in bt):
-            if not args: return False, ("Not enough arguments to remove mode {}".format(char))
+            if not args:
+                return False, ("Not enough arguments to remove mode {}".format(char))
             result[1].append((char, args.pop(0)))
         elif cstr == "-" and (char in ct or char in dt):
             result[1].append(char)

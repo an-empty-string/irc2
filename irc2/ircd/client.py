@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """irc2.ircd client abstractions"""
 
 from . import utils
@@ -7,6 +8,7 @@ import collections
 import uuid
 
 class Client(object):
+
     def __init__(self, reader, writer, manager, handler):
         self.id = str(uuid.uuid4())
         self.reader = reader
@@ -70,6 +72,7 @@ class Client(object):
             del self.data["channels"].pop().members[self]
 
 class ClientManager(set):
+
     def __init__(self):
         self.map = {}
         super().__init__()

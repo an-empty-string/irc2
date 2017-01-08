@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 RPL_WELCOME = "001"
 RPL_YOURHOST = "002"
 RPL_ISUPPORT = "005"

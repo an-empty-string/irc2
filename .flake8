@@ -1,0 +1,3 @@
+[flake8]
+# "I strongly dislike two blank lines in a row" -- fwilson
+ignore = P101, P102, P103, E302, E305
