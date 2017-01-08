@@ -2,7 +2,7 @@ import collections
 import time
 
 from . import utils
-from .numerics import *
+from .numerics import RPL_TOPIC, RPL_TOPICBY, RPL_NAMREPLY, RPL_ENDOFNAMES
 from ..utils import join_max_length
 
 class Channel:
