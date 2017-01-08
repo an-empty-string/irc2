@@ -1,5 +1,5 @@
 from .handler import handler
-from .numerics import *
+from .numerics import RPL_WELCOME, RPL_YOURHOST, RPL_ISUPPORT, RPL_MOTDSTART, RPL_MOTD, RPL_ENDOFMOTD
 import re
 
 # list, with parameter, none req on removal, no parameter
@@ -32,7 +32,7 @@ def parse_mode(mode, kinds):
     # D-type: setting no parameter
 
     data = mode.split(maxsplit=1)
-    modes, args = data[0], ""
+    args = ""
     if len(data) > 1:
         args = data[1]
     args = args.split()

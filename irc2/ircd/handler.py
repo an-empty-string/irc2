@@ -1,6 +1,6 @@
 from . import utils
-from .numerics import *
-from ..parser import Message, parse_line
+from .numerics import ERR_ERRONEUSNICKNAME, ERR_NICKNAMEINUSE, ERR_UMODEUNKNOWNFLAG, ERR_USERSDONTMATCH
+from ..parser import parse_line
 import logging
 import stuf
 
@@ -117,6 +117,8 @@ class IRCHandler(object):
         if not client.check_registered(): return
         if len(line.args) < 1: return
         target = line.args[0]
+        # TODO(fwilson): implement.
+        assert(target is None)
 
     def handle_privmsg(self, client, line):
         if not client.check_registered(): return

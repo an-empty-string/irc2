@@ -1,5 +1,5 @@
 import asyncio
-import uuid
+from .client import clients
 
 async def handle_incoming(reader, writer):
     client = clients.new(reader, writer)

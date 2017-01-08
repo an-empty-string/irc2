@@ -94,9 +94,9 @@ class IRCClient(object):
         self.subscriptions.append((pat, handler))
 
     async def _run_handlers(self, line):
-        for pat, handler in self.subscriptions:
+        for pat, line_handler in self.subscriptions:
             if pat.matches(line):
-                await handler(line)
+                await line_handler(line)
 
     async def handle(self):
         """

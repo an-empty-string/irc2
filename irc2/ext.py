@@ -3,7 +3,6 @@
 from . import parser, utils
 import asyncio
 import base64
-import collections
 
 class IRCCaps(object):
     """

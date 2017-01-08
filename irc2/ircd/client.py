@@ -1,10 +1,8 @@
 """irc2.ircd client abstractions"""
 
 from . import utils
-from .handler import handler
-from .numerics import *
+from .numerics import ERR_NOTREGISTERED
 import asyncio
-import collections
 import stuf
 import uuid
 
