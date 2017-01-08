@@ -1,0 +1,3 @@
+[console_scripts]
+ircd = irc2.ircd.ircd:main
+

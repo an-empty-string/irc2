@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: Irc2
+Version: 0.1
+Summary: Irc Done right
+Home-page: https://github.com/fwilson42/irc2
+Author: Fox Wilson
+Author-email: UNKNOWN
+License: UNKNOWN
+Description: UNKNOWN
+Keywords: irc
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Topic :: Communications :: Chat :: Internet Relay Chat
