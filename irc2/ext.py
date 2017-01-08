@@ -1,14 +1,16 @@
+# -*- coding: utf-8 -*-
 """irc2 extensions (cap, sasl, etc)"""
 
 from . import parser, utils
 import asyncio
 import base64
-import collections
+
 
 class IRCCaps(object):
     """
     IRCCaps manages IRCv3 capabilities.
     """
+
     def __init__(self, client):
         self.client = client
         self.caps = set()
@@ -42,10 +44,12 @@ class IRCCaps(object):
     async def end(self):
         await self.client.send("CAP", "END")
 
+
 class IRCSasl(object):
     """
     IRCSasl manages SASL authentication.
     """
+
     def __init__(self, client):
         self.client = client
 
@@ -66,19 +70,21 @@ class IRCSasl(object):
             raise Exception("SASL authentication failed")
         return True
 
+
 class IRCState(object):
     """
     Track user and channel state.
     """
+
     def __init__(self, client):
         self.client = client
 
     async def enable(self):
         await self.client.cap.req("multi-prefix")
-        if all([await self.client.cap.req("extended-join"),
-                await self.client.cap.req("account-notify")]):
+        if all([await self.client.cap.req("extended-join"), await self.client.cap.req("account-notify")]):
             return True
         return False
+
 
 if __name__ == '__main__':
     import doctest

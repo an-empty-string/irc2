@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import collections
+
 
 class Dispatcher(object):
     """
@@ -57,10 +59,13 @@ class Dispatcher(object):
                 await f(*args)
 
     def __getattr__(self, attr):
+
         def decorator(f):
             self.subscribe(attr, f)
             return f
+
         return decorator
+
 
 if __name__ == '__main__':
     import doctest
