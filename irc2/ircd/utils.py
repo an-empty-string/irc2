@@ -15,13 +15,13 @@ def valid_nick(nick):
 
 def send_welcome(client):
     client.send_numeric(RPL_WELCOME, "Welcome to IRC")
-    client.send_numeric(RPL_YOURHOST, "Your host is {}, running irc2.ircd".format(handler.config.name))
+    client.send_numeric(RPL_YOURHOST, "Your host is {}, running irc2.ircd".format(handler.config["name"]))
     client.send_numeric(RPL_ISUPPORT, "NOTHING", "is supported by this server")
     send_motd(client)
 
 def send_motd(client):
     client.send_numeric(RPL_MOTDSTART, "MOTD is:")
-    client.send_numeric(RPL_MOTD, handler.config.motd)
+    client.send_numeric(RPL_MOTD, handler.config["motd"])
     client.send_numeric(RPL_ENDOFMOTD, "End of MOTD")
 
 def parse_mode(mode, kinds):

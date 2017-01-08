@@ -5,7 +5,7 @@ from . import utils
 from .numerics import *
 from ..utils import join_max_length
 
-class Channel(object):
+class Channel:
     def __init__(self, name):
         self.name = name
         self.ts = time.time()
@@ -17,7 +17,7 @@ class Channel(object):
 
     def add(self, client):
         # update state
-        client.data.channels.add(self)
+        client.data["channels"].add(self)
         self.members[client] = "" if self.members else "o"
 
         # send JOIN
@@ -29,9 +29,9 @@ class Channel(object):
             client.send_numeric(RPL_TOPICBY, self.name, self.topic_belongs_to, str(self.topic_set_at))
 
         # send NAMES
-        names = [(utils.prefixes[value[0]] if value else "") + key.data.nickname
+        names = [(utils.prefixes[value[0]] if value else "") + key.data["nickname"]
                  for key, value in
-                    sorted(self.members.items(), key=lambda k: k[0].data.nickname)]
+                    sorted(self.members.items(), key=lambda k: k[0].data["nickname"])]
 
         while names:
             cur, names = join_max_length(names, " ")
