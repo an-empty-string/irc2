@@ -5,7 +5,6 @@ from .handler import handler
 from .numerics import *
 import asyncio
 import collections
-import stuf
 import uuid
 
 class Client(object):
@@ -17,21 +16,21 @@ class Client(object):
         self.handler = handler
         self.registered = False
 
-        self.futures = stuf.defaultstuf(asyncio.Future)
-        self.data = stuf.defaultstuf(lambda: None)
-        self.data.host = self.writer.get_extra_info("peername")[0]
-        self.data.modes = set()
-        self.data.channels = set()
+        self.futures = collections.defaultdict(asyncio.Future)
+        self.data = collections.defaultdict(lambda: None)
+        self.data["host"] = self.writer.get_extra_info("peername")[0]
+        self.data["modes"] = set()
+        self.data["channels"] = set()
 
         manager.loop.create_task(self.send_welcome())
 
     def hostmask(self):
-        return self.data.nickname + "!" + self.data.ident + "@" + self.data.host
+        return self.data["nickname"] + "!" + self.data["ident"] + "@" + self.data["host"]
 
     async def send_welcome(self):
-        await asyncio.wait([self.futures.nick, self.futures.user])
+        await asyncio.wait([self.futures["nick"], self.futures["user"]])
         self.registered = True
-        self.manager.map[self.data.nickname] = self
+        self.manager.map[self.data["nickname"]] = self
         utils.send_welcome(self)
 
     def write(self, line):
@@ -45,7 +44,7 @@ class Client(object):
 
     def all_channel_clients(self):
         result = set()
-        for chan in self.data.channels:
+        for chan in self.data["channels"]:
             result |= set(chan.members.keys())
         return result
 
@@ -61,15 +60,15 @@ class Client(object):
 
     def set_nick(self, nick):
         self.manager.map[nick] = self
-        self.manager.map.pop(self.data.nickname, None)
-        self.data.nickname = nick
+        self.manager.map.pop(self.data["nickname"], None)
+        self.data["nickname"] = nick
 
     def done(self):
         if self in self.manager:
             self.manager.remove(self)
 
-        while self.data.channels:
-            del self.data.channels.pop().members[self]
+        while self.data["channels"]:
+            del self.data["channels"].pop().members[self]
 
 class ClientManager(set):
     def __init__(self):

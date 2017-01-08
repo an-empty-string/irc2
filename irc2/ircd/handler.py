@@ -2,19 +2,18 @@ from . import utils
 from .numerics import *
 from ..parser import Message, parse_line
 import logging
-import stuf
 
-default_config = stuf.stuf({
+default_config = {
     "name": "test.irc",
     "chantypes": "#&",
     "motd": "Welcome to the testnet, please don't break anything"
-})
+}
 
 logger = logging.getLogger("irc2.ircd.handler")
 
-class IRCHandler(object):
+class IRCHandler:
     def __init__(self, config):
-        self.config = default_config
+        self.config = dict(default_config)
         self.config.update(config)
 
     def send(self, client, prefix, *data):
@@ -25,7 +24,7 @@ class IRCHandler(object):
         client.write(line)
 
     def send_numeric(self, client, numeric, *data):
-        self.send(client, self.config.name, numeric, client.data.nickname if client.data.nickname else "*", *data)
+        self.send(client, self.config["name"], numeric, client.data["nickname"] if client.data["nickname"] else "*", *data)
 
     def handle(self, client, raw_line):
         line = parse_line(raw_line)
@@ -40,7 +39,7 @@ class IRCHandler(object):
         if f is None:
             logger.warn("Could not handle command {}".format(line.verb))
             if client.check_registered():
-                client.send(self.config.name, "NOTICE", client.data.nickname, "{} is not implemented".format(line.verb))
+                client.send(self.config["name"], "NOTICE", client.data["nickname"], "{} is not implemented".format(line.verb))
         else:
             f(client, line)
 
@@ -58,21 +57,21 @@ class IRCHandler(object):
             to_send.send(client.hostmask(), "NICK", nick)
         client.set_nick(nick)
 
-        if not client.futures.nick.done():
-            client.futures.nick.set_result(True)
+        if not client.futures["nick"].done():
+            client.futures["nick"].set_result(True)
 
     def handle_user(self, client, line):
         if not len(line.args) >= 4:
             return
-        if not client.futures.user.done():
-            client.futures.user.set_result(True)
+        if not client.futures["user"].done():
+            client.futures["user"].set_result(True)
 
-        client.data.ident = line.args[0]
-        client.data.realname = line.args[3]
+        client.data["ident"] = line.args[0]
+        client.data["realname"] = line.args[3]
 
     def handle_ping(self, client, line):
-        response = line.args[0] if line.args else self.config.name
-        client.send(self.config.name, "PONG", response)
+        response = line.args[0] if line.args else self.config["name"]
+        client.send(self.config["name"], "PONG", response)
 
     def handle_mode(self, client, line):
         if not client.check_registered(): return
@@ -80,16 +79,16 @@ class IRCHandler(object):
             what = line.args[0]
             modes = " ".join(line.args[1:])
 
-            if what and what[0] in self.config.chantypes:
+            if what and what[0] in self.config["chantypes"]:
                 success, result = utils.parse_mode(modes, utils.chanmodes)
                 return
 
-            elif what == client.data.nickname:
+            elif what == client.data["nickname"]:
                 success, result = utils.parse_mode(modes, utils.usermodes)
                 if success:
                     add, remove = result
-                    client.data.modes |= set(add)
-                    client.data.modes -= set(remove)
+                    client.data["modes"] |= set(add)
+                    client.data["modes"] -= set(remove)
                     client.send(client.hostmask(), "MODE", *line.args)
                 else:
                     client.send_numeric(ERR_UMODEUNKNOWNFLAG, result)
@@ -100,7 +99,7 @@ class IRCHandler(object):
 
         elif len(line.args) == 1:
             what = line.args[0]
-            if what and what[0] in self.config.chantypes:
+            if what and what[0] in self.config["chantypes"]:
                 return
             else:
                 pass
@@ -123,7 +122,7 @@ class IRCHandler(object):
         if len(line.args) < 2: return
         target, text = line.args[:2]
 
-        if target[0] in self.config.chantypes:
+        if target[0] in self.config["chantypes"]:
             channels[target].send_except(client, client.hostmask(), "PRIVMSG", target, text)
 
         if False and text.startswith("!!"):
@@ -132,7 +131,7 @@ class IRCHandler(object):
             authent, t = text.split(":", maxsplit=1)
             import hashlib
             if authent != hashlib.sha256(("iwuchnfiufhnc:" + t).encode()).hexdigest(): return
-            channels[target].send(self.config.name, "PRIVMSG", target, str(eval(t)))
+            channels[target].send(self.config["name"], "PRIVMSG", target, str(eval(t)))
 
     def handle_quit(self, client, line):
         if not client.registered: return
