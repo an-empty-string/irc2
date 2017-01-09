@@ -31,6 +31,8 @@ class IRCConnection(object):
         self.ssl = ssl
         self.connected = False
         self.callback = None
+        self.reader = None
+        self.writer = None
 
     async def connect(self):
         """

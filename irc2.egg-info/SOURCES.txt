@@ -2,12 +2,6 @@
 .gitignore
 LICENSE
 setup.py
-Irc2.egg-info/PKG-INFO
-Irc2.egg-info/SOURCES.txt
-Irc2.egg-info/dependency_links.txt
-Irc2.egg-info/entry_points.txt
-Irc2.egg-info/requires.txt
-Irc2.egg-info/top_level.txt
 irc2/__init__.py
 irc2/client.py
 irc2/connection.py
