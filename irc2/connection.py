@@ -3,6 +3,7 @@
 
 from . import parser
 import asyncio
+import socket
 import logging
 
 class IRCConnection(object):
@@ -34,12 +35,18 @@ class IRCConnection(object):
         self.reader = None
         self.writer = None
 
+    def shutdown(self):
+        # TODO: This doesn't actually clean up everything.
+        if self.writer is not None:
+            self.writer.close()
+
     async def connect(self):
         """
         Idempotently establish a connection to the IRC server.
         """
         if not self.connected:
-            self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=self.ssl)
+            # TODO: make ipv6 configurable, or figure out why it takes so long.
+            self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=self.ssl, family=socket.AF_INET)
             self.connected = True
 
         return self
