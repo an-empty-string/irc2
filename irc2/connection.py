@@ -36,8 +36,9 @@ class IRCConnection(object):
         self.writer = None
 
     def shutdown(self):
-        # TODO: This doesn't actually clean up everything.
-        if self.writer is not None:
+        # TODO: we're still leaking a fd.
+        self.reader.feed_eof()
+        if self.writer:
             self.writer.close()
 
     async def connect(self):
@@ -56,7 +57,11 @@ class IRCConnection(object):
         return self
 
     async def __anext__(self):
-        return parser.parse_line(await self.reader.readline())
+        line = await self.reader.readline()
+        if line:
+            return parser.parse_line(line)
+        else:
+            raise StopAsyncIteration
 
     async def match(self, *pats, **kwargs):
         """
