@@ -2,7 +2,6 @@
 from . import utils
 from .numerics import ERR_ERRONEUSNICKNAME, ERR_NICKNAMEINUSE, ERR_UMODEUNKNOWNFLAG, ERR_USERSDONTMATCH
 from ..parser import parse_line
-from .channel import channels
 import logging
 
 default_config = {
@@ -115,6 +114,7 @@ class IRCHandler(object):
         if len(line.args) < 1:
             return
 
+        from .channel import channels
         channel = line.args[0]
         cobj = channels[channel]
         cobj.add(client)
