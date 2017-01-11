@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 from . import utils
-from .numerics import *
-from ..parser import Message, parse_line
+from .numerics import ERR_ERRONEUSNICKNAME, ERR_NICKNAMEINUSE, ERR_UMODEUNKNOWNFLAG, ERR_USERSDONTMATCH
+from ..parser import parse_line
 import logging
 
 default_config = {
@@ -11,7 +12,8 @@ default_config = {
 
 logger = logging.getLogger("irc2.ircd.handler")
 
-class IRCHandler:
+class IRCHandler(object):
+
     def __init__(self, config):
         self.config = dict(default_config)
         self.config.update(config)
@@ -45,7 +47,8 @@ class IRCHandler:
 
     def handle_nick(self, client, line):
         from .client import clients
-        if not line.args: return
+        if not line.args:
+            return
         nick = line.args[0]
 
         if not utils.valid_nick(nick):
@@ -74,7 +77,8 @@ class IRCHandler:
         client.send(self.config["name"], "PONG", response)
 
     def handle_mode(self, client, line):
-        if not client.check_registered(): return
+        if not client.check_registered():
+            return
         if len(line.args) >= 2:
             what = line.args[0]
             modes = " ".join(line.args[1:])
@@ -105,21 +109,30 @@ class IRCHandler:
                 pass
 
     def handle_join(self, client, line):
-        if not client.check_registered(): return
-        if len(line.args) < 1: return
+        if not client.check_registered():
+            return
+        if len(line.args) < 1:
+            return
 
+        from .channel import channels
         channel = line.args[0]
         cobj = channels[channel]
         cobj.add(client)
 
     def handle_part(self, client, line):
-        if not client.check_registered(): return
-        if len(line.args) < 1: return
+        if not client.check_registered():
+            return
+        if len(line.args) < 1:
+            return
         target = line.args[0]
+        # TODO(fwilson): implement.
+        assert (target is None)
 
     def handle_privmsg(self, client, line):
-        if not client.check_registered(): return
-        if len(line.args) < 2: return
+        if not client.check_registered():
+            return
+        if len(line.args) < 2:
+            return
         target, text = line.args[:2]
 
         if target[0] in self.config["chantypes"]:
@@ -127,14 +140,17 @@ class IRCHandler:
 
         if False and text.startswith("!!"):
             text = text[2:]
-            if ":" not in text: return
+            if ":" not in text:
+                return
             authent, t = text.split(":", maxsplit=1)
             import hashlib
-            if authent != hashlib.sha256(("iwuchnfiufhnc:" + t).encode()).hexdigest(): return
+            if authent != hashlib.sha256(("iwuchnfiufhnc:" + t).encode()).hexdigest():
+                return
             channels[target].send(self.config["name"], "PRIVMSG", target, str(eval(t)))
 
     def handle_quit(self, client, line):
-        if not client.registered: return
+        if not client.registered:
+            return
         for to_send in client.all_channel_clients():
             to_send.send(client.hostmask(), "QUIT", *line.args)
 
@@ -146,6 +162,5 @@ class IRCHandler:
         client.writer.write_eof()
         client.done()
 
-handler = IRCHandler({})
 
-from .channel import channels
+handler = IRCHandler({})

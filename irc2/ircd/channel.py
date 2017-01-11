@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
 import collections
 import time
 
 from . import utils
-from .numerics import *
+from .numerics import RPL_TOPIC, RPL_TOPICBY, RPL_NAMREPLY, RPL_ENDOFNAMES
 from ..utils import join_max_length
 
-class Channel:
+class Channel(object):
+
     def __init__(self, name):
         self.name = name
         self.ts = time.time()
@@ -31,7 +33,7 @@ class Channel:
         # send NAMES
         names = [(utils.prefixes[value[0]] if value else "") + key.data["nickname"]
                  for key, value in
-                    sorted(self.members.items(), key=lambda k: k[0].data["nickname"])]
+                 sorted(self.members.items(), key=lambda k: k[0].data["nickname"])]
 
         while names:
             cur, names = join_max_length(names, " ")
@@ -48,6 +50,7 @@ class Channel:
                 member.send(*data)
 
 class Channels(dict):
+
     def __missing__(self, key):
         self[key] = Channel(key)
         return self[key]

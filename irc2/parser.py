@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """irc2 parser"""
 
 from .utils import IStr
@@ -12,6 +13,7 @@ class Prefix(object):
         ident       An ident/username, or None.
         host        A hostname, or None.
     """
+
     def __init__(self, prefix):
         self.prefix = prefix
         self._parse()

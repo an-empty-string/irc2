@@ -1,12 +1,7 @@
+.flake8
 .gitignore
 LICENSE
 setup.py
-Irc2.egg-info/PKG-INFO
-Irc2.egg-info/SOURCES.txt
-Irc2.egg-info/dependency_links.txt
-Irc2.egg-info/entry_points.txt
-Irc2.egg-info/requires.txt
-Irc2.egg-info/top_level.txt
 irc2/__init__.py
 irc2/client.py
 irc2/connection.py
@@ -15,6 +10,12 @@ irc2/ext.py
 irc2/handler.py
 irc2/parser.py
 irc2/utils.py
+irc2.egg-info/PKG-INFO
+irc2.egg-info/SOURCES.txt
+irc2.egg-info/dependency_links.txt
+irc2.egg-info/entry_points.txt
+irc2.egg-info/requires.txt
+irc2.egg-info/top_level.txt
 irc2/ircd/channel.py
 irc2/ircd/client.py
 irc2/ircd/handler.py

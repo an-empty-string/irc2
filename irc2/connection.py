@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 """irc2 connection management"""
 
 from . import parser
 import asyncio
+import socket
 import logging
 
 class IRCConnection(object):
@@ -30,13 +32,22 @@ class IRCConnection(object):
         self.ssl = ssl
         self.connected = False
         self.callback = None
+        self.reader = None
+        self.writer = None
+
+    def shutdown(self):
+        # TODO: we're still leaking a fd.
+        self.reader.feed_eof()
+        if self.writer:
+            self.writer.close()
 
     async def connect(self):
         """
         Idempotently establish a connection to the IRC server.
         """
         if not self.connected:
-            self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=self.ssl)
+            # TODO: make ipv6 configurable, or figure out why it takes so long.
+            self.reader, self.writer = await asyncio.open_connection(self.host, self.port, ssl=self.ssl, family=socket.AF_INET)
             self.connected = True
 
         return self
@@ -46,7 +57,11 @@ class IRCConnection(object):
         return self
 
     async def __anext__(self):
-        return parser.parse_line(await self.reader.readline())
+        line = await self.reader.readline()
+        if line:
+            return parser.parse_line(line)
+        else:
+            raise StopAsyncIteration
 
     async def match(self, *pats, **kwargs):
         """
@@ -86,4 +101,3 @@ class IRCConnection(object):
 
         logging.info("Send: {}".format(parser.parse_line(line)))
         self.writer.write(line)
-
